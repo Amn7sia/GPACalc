@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPA Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+        }
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+        .add-row {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .reset {
+            background-color: #ff5722;
+            color: white;
+        }
+        .delete {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .delete:hover {
+            opacity: 0.8;
+        }
+        .gpa-result {
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>GPA Calculator</h1>
+    <table id="gpa-table">
+        <thead>
+            <tr>
+                <th>Select</th>
+                <th>Course</th>
+                <th>Grade</th>
+                <th>Credits</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="checkbox" class="row-check"></td>
+                <td><input type="text" class="course" placeholder="Enter course name"></td>
+                <td>
+                    <select class="grade">
+                        <option value="">Select</option>
+                        <option value="4.0">A</option>
+                        <option value="3.7">A-</option>
+                        <option value="3.3">B+</option>
+                        <option value="3.0">B</option>
+                        <option value="2.7">B-</option>
+                        <option value="2.3">C+</option>
+                        <option value="2.0">C</option>
+                        <option value="1.7">C-</option>
+                        <option value="1.0">D</option>
+                        <option value="0.0">F</option>
+                    </select>
+                </td>
+                <td><input type="number" class="credits" min="0" step="0.1"></td>
+                <td><button class="delete">X</button></td>
+            </tr>
+        </tbody>
+    </table>
+    <button class="add-row">Add Row</button>
+    <button class="reset">Reset</button>
+    <button class="calculate-gpa">Calculate GPA</button>
+    <p class="gpa-result">GPA: <span id="gpa-value">0.00</span></p>
+
+    <script>
+        const tableBody = document.querySelector('#gpa-table tbody');
+        const addRowButton = document.querySelector('.add-row');
+        const resetButton = document.querySelector('.reset');
+        const calculateGpaButton = document.querySelector('.calculate-gpa');
+        const gpaValue = document.getElementById('gpa-value');
+
+        // Add a new row
+        addRowButton.addEventListener('click', () => {
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td><input type="checkbox" class="row-check"></td>
+                <td><input type="text" class="course" placeholder="Enter course name"></td>
+                <td>
+                    <select class="grade">
+                        <option value="">Select</option>
+                        <option value="4.0">A</option>
+                        <option value="3.7">A-</option>
+                        <option value="3.3">B+</option>
+                        <option value="3.0">B</option>
+                        <option value="2.7">B-</option>
+                        <option value="2.3">C+</option>
+                        <option value="2.0">C</option>
+                        <option value="1.7">C-</option>
+                        <option value="1.0">D</option>
+                        <option value="0.0">F</option>
+                    </select>
+                </td>
+                <td><input type="number" class="credits" min="0" step="0.1"></td>
+                <td><button class="delete">X</button></td>
+            `;
+            tableBody.appendChild(newRow);
+        });
+
+        // Delete a row
+        tableBody.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete')) {
+                e.target.closest('tr').remove();
+            }
+        });
+
+        // Resetting, set everything to empty
+        resetButton.addEventListener('click', () => {
+            document.querySelectorAll('.row-check').forEach((checkbox) => {
+                checkbox.checked = false;
+                const row = checkbox.closest('tr');
+                row.querySelector('.grade').value = '';
+                row.querySelector('.credits').value = '';
+                row.querySelector('.course').value = '';
+            });
+            gpaValue.textContent = '0.00';
+        });
+
+        // Calculate GPA button logic
+        calculateGpaButton.addEventListener('click', calculateGPA);
+
+        // Calculate GPA function
+        function calculateGPA() {
+            let totalCredits = 0;
+            let totalGradePoints = 0;
+
+            document.querySelectorAll('#gpa-table tbody tr').forEach(row => {
+                const gradeValue = parseFloat(row.querySelector('.grade').value) || 0;
+                const creditsValue = parseFloat(row.querySelector('.credits').value) || 0;
+                const isChecked = row.querySelector('.row-check').checked;
+
+                if (isChecked && gradeValue > 0 && creditsValue > 0) {
+                    totalGradePoints += gradeValue * creditsValue;
+                    totalCredits += creditsValue;
+                }
+            });
+
+            const gpa = totalCredits > 0 ? (totalGradePoints / totalCredits).toFixed(2) : "0.00";
+            gpaValue.textContent = gpa;
+        }
+    </script>
+</body>
+</html>
